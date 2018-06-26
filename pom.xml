@@ -6,6 +6,59 @@
   
   
   
+  
+  <build>
+	  <sourceDirectory>src/main/scala</sourceDirectory>
+	  
+	  <resources>
+	  
+	   <resource>
+            <directory>src/test/scala</directory>
+            <includes>
+                <include>**/*.java</include>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+            </includes>
+        </resource>
+
+        <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.java</include>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+            </includes>
+        </resource>
+        
+         <resource>
+            <directory>src/test/resources</directory>
+            <includes>
+                <include>**/*.java</include>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+            </includes>
+        </resource>
+	  </resources>
+	  
+	  
+	   <plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>3.7.0</version>
+	        <configuration>
+	          <!-- or whatever version you use -->
+	          <source>1.8</source>
+	          <target>1.8</target>
+	        </configuration>
+	    </plugin>
+	      
+	   </plugins>
+	  
+  </build>
+  
+  
+  
   <dependencies>
   
 	  <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
