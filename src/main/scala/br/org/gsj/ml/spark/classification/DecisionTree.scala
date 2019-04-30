@@ -1,4 +1,4 @@
-package br.org.gsj.ml.classification
+package br.org.gsj.ml.spark.classification
 
 import org.apache.spark.sql.SparkSession
 
