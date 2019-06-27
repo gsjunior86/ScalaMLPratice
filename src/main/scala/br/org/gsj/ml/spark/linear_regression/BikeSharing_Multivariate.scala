@@ -3,11 +3,12 @@ package br.org.gsj.ml.spark.linear_regression
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import scala.collection.mutable.ListBuffer
 
 object BikeSharing_Multivariate {
-  
+
   def main(args: Array[String]): Unit = {
-    
+
     val spark = SparkSession.builder()
       .appName("bikeSharing-spark")
       .master("local[*]")
@@ -33,10 +34,24 @@ object BikeSharing_Multivariate {
       .withColumn("registered", col("registered").cast(IntegerType))
       .withColumn("cnt", col("cnt").cast(IntegerType))
 
+    val independent_variables = Array("season", "yr", "mnth", "holiday",
+      "weekday", "workingday", "weathersit", "temp", "atemp",
+      "hum", "windspeed")
       
-
-       bsDay_df.printSchema()
+    val dependent_variable = Array("cnt")
     
+    val bike_sharing_df = bsDay_df.select(independent_variables.union(dependent_variable).map(col): _*)
+    
+    val listRes = new ListBuffer[String]
+
+    for (i <- bike_sharing_df.columns) {
+      listRes+=("Correlation to CNT for: " + i + ", " + bsDay_df.stat.corr("cnt", i))
+    }
+    
+    listRes.foreach(println)
+
+//    bsDay_df.printSchema()
+
   }
-  
+
 }
