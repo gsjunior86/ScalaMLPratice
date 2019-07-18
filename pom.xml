@@ -61,6 +61,14 @@
 			<version>2.4.1</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-graphx -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-graphx_2.11</artifactId>
+			<version>2.4.3</version>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/databricks/spark-deep-learning -->
 		<dependency>
 			<groupId>databricks</groupId>
