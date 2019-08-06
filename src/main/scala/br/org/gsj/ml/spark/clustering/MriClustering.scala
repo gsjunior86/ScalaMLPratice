@@ -12,6 +12,7 @@ import java.awt.image.MemoryImageSource
 import javax.imageio.ImageIO
 import java.awt.Toolkit
 import java.awt.image.BufferedImage
+import br.org.gsj.ml.scala.util.ImageUtils
 
 object MriClustering {
   
@@ -54,9 +55,14 @@ object MriClustering {
     val mri_healthy_brain_clusters_df = kmeans_model.transform(mri_healthy_brain_df)
     .select("features","prediction")
     
-    val image_array = mri_healthy_brain_clusters_df.select("prediction").rdd.map(f => f.getAs[Int](0)).collect()
+    val image_array = mri_healthy_brain_clusters_df.select("prediction").rdd.map(f => f.getAs[Int](0).toByte).collect()
     println(image_array.size)
     
+    val photo1 = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"))
+    val photo2 = ImageUtils.generateImage(photo1, image_array)
+    
+    ImageIO.write(photo2, "jpg", new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-test.png"))
+
 //    val bImage = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain_cluster.jpg"));
 //    val bos = new ByteArrayOutputStream();
 //    ImageIO.write(bImage, "jpg", bos );
@@ -73,34 +79,6 @@ object MriClustering {
 
   }
   
-  def phototest(img: BufferedImage): BufferedImage = {
-  // obtain width and height of image
-  val w = img.getWidth
-  val h = img.getHeight
 
-  // create new image of the same size
-  val out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
-
-  // copy pixels (mirror horizontally)
-  for (x <- 0 until w)
-    for (y <- 0 until h)
-      out.setRGB(x, y, img.getRGB(w - x - 1, y) & 0xffffff)
-  
-  // draw red diagonal line
-  for (x <- 0 until (h min w))
-    out.setRGB(x, x, 0xff0000)
-
-  out
-}
-  
-def test() {
-  // read original image, and obtain width and height
-  val photo1 = ImageIO.read(new File("photo.jpg"))
-  
-  val photo2 = phototest(photo1) 
-
-  // save image to file "test.jpg"
-  ImageIO.write(photo2, "jpg", new File("test.jpg"))
-}
   
 }
