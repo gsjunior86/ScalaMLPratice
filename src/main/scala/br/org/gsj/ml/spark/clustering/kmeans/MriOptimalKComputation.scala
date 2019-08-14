@@ -1,4 +1,4 @@
-package br.org.gsj.ml.spark.clustering
+package br.org.gsj.ml.spark.clustering.kmeans
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
@@ -11,7 +11,7 @@ import java.io.File
 /**
  * plot the optimal number of clusters K based on the K-means cost function for a range of K
  */
-object OptimalKComputation {
+object MriOptimalKComputation {
     case class Image(data: Byte)
 
   

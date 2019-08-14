@@ -1,4 +1,4 @@
-package br.org.gsj.ml.spark.clustering
+package br.org.gsj.ml.spark.clustering.kmeans
 
 import java.io.ByteArrayInputStream
 import java.io.File
