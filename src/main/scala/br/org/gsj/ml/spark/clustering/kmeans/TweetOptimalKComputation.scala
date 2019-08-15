@@ -36,9 +36,19 @@ object TweetOptimalKComputation {
     }
     
     val tweetClean = udf { s: Seq[String] =>
-      s.map(f =>  f.replaceAll("'",""))
-      .filterNot(p => p.startsWith("-") || p.startsWith("@")|| p.contains("&")
-          || p.contains(";"))
+      s.map(f =>
+            f.replaceAll("'","")
+           .replaceAll("[^\\p{ASCII}]", "")
+           .replaceAll("\\(", "")
+           .replaceAll("\\)","")
+           .replaceAll("\\#","")
+           .replaceAll("\\$","")
+           .replaceAll("\\]","")
+           .replaceAll("\\[","")
+
+          )
+      .filterNot(p => p.startsWith("-") || p.contains("@")|| p.contains("&")
+          || p.contains(";") || p.length() <=2)
     }
     
     val countArray = udf { s: Seq[String] =>
@@ -52,13 +62,21 @@ object TweetOptimalKComputation {
     val stopwords = new StopWordsRemover().setInputCol("tweet_msg").setOutputCol("tweet_clean").setStopWords(stop_words_array)
 
     val new_df = tweets_df.withColumn("tweet_msg", splitUDF(col("tweet_msg")))
-    new_df.printSchema()
-
-    stopwords.transform(new_df).withColumn("tweet_clean", tweetClean(col("tweet_clean")))
+    
+    val base_df = stopwords.transform(new_df).withColumn("tweet_clean", tweetClean(col("tweet_clean")))
     .withColumn("array_count", countArray(col("tweet_clean")))
-     .drop("tweet_msg").select(col("tweet_id") +: (0 until 17).map(i => col("tweet_clean")(i).alias(s"col$i")): _* )
-     
-     .write.json("src/main/resources/datasets/clustering/data/health-tweets/json")
+    
+//    base_df.select(explode(col("tweet_clean"))).distinct().show
+    
+    base_df.select(explode(col("tweet_clean"))).distinct().rdd.map(f => f(0).toString()).zipWithIndex()
+    .foreach(println)
+    
+//     val array_count = base_df.groupBy().max("array_count").collect()(0)(0).asInstanceOf[Integer]
+//    
+//     base_df
+//     .drop("tweet_msg").select(col("tweet_id") +: (0 until array_count).map(i => col("tweet_clean")(i).alias(s"col$i")): _* )
+//     
+//     .show
 
   }
 
