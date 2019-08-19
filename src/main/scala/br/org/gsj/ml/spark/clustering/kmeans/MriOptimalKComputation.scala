@@ -18,7 +18,7 @@ object MriOptimalKComputation {
   def main(args: Array[String]): Unit = {
     
     val spark = SparkSession.builder().appName("mriClass").master("local[*]").getOrCreate()
-    val mri_healthy_brain_image = "src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"
+    val mri_healthy_brain_image = "src/main/resources/datasets/clustering/data/mri-images-data/mri-test-brain.png"
     
     val image_df = spark.read.format("image").load(mri_healthy_brain_image).select(col("image.*"))
     image_df.show

@@ -16,32 +16,25 @@ import br.org.gsj.ml.scala.util.ImageUtils
 
 object MriClustering {
   
-  case class Image(data: Byte)
+  case class Image(data: Int, pos: Int)
   
   def main(args: Array[String]): Unit = {
     
     val spark = SparkSession.builder().appName("mriClass").master("local[*]").getOrCreate()
-    val mri_healthy_brain_image = "src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"
+    val mri_healthy_brain_image = "src/main/resources/datasets/clustering/data/mri-images-data/mri-test-brain.png"
     
-    val image_df = spark.read.format("image").load(mri_healthy_brain_image).select(col("image.*"))
-    image_df.show
-    image_df.printSchema
+    val image_array = ImageUtils.loadImageArray(mri_healthy_brain_image)
+        
     import spark.implicits._
     
-    val data = image_df.rdd.collect().map(f => f(5))
-    
-    val data_array: Array[Byte] = data(0).asInstanceOf[Array[Byte]]
-    
-    val transposed_df = spark.sparkContext.parallelize(data_array).map(f => Image(f)).toDF
-
-    transposed_df.show
-    
+    val image_df = spark.sparkContext.parallelize(image_array).map(f => Image(f._1,f._2)).toDF
+          
     val features_col = Array("data")
     val vector_assembler = new VectorAssembler()
     .setInputCols(features_col)
     .setOutputCol("features")
     
-    val mri_healthy_brain_df = vector_assembler.transform(transposed_df).select("features")
+    val mri_healthy_brain_df = vector_assembler.transform(image_df)  
     
     val k = 5
     val kmeans = new KMeans().setK(k).setSeed(12345).setFeaturesCol("features")
@@ -53,29 +46,19 @@ object MriClustering {
       
       
     val mri_healthy_brain_clusters_df = kmeans_model.transform(mri_healthy_brain_df)
-    .select("features","prediction")
+    .select("features","prediction","pos")
     
-    val image_array = mri_healthy_brain_clusters_df.select("prediction").rdd.map(f => f.getAs[Int](0).toByte).collect()
+    mri_healthy_brain_clusters_df.show
+   
+    val image_array_final = mri_healthy_brain_clusters_df.select("prediction").rdd.map(f => f.getAs[Int](0).toByte).collect()
     println(image_array.size)
-    
-    val photo1 = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"))
-    val photo2 = ImageUtils.generateImage(photo1, image_array)
+   
+    val photo1 = ImageIO.read(new File(mri_healthy_brain_image))
+    val photo2 = ImageUtils.generateImage(photo1, image_array_final)
     
     ImageIO.write(photo2, "jpg", new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-test.png"))
 
-//    val bImage = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain_cluster.jpg"));
-//    val bos = new ByteArrayOutputStream();
-//    ImageIO.write(bImage, "jpg", bos );
-//    val datai = bos.toByteArray();
-    
-//    val ims = new MemoryImageSource(256,256,data_array.map(f => f.toInt),0,256)
-//    val image = Toolkit.getDefaultToolkit().createImage(ims)
-//    
-//    val bi = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-//    bi.getGraphics().drawImage(image,0,0, null);
-//    ImageIO.write(bi, "JPG", new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain_cluster.jpg"));
 
-  //http://otfried.org/scala/image.html
 
   }
   
