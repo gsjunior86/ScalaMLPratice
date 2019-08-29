@@ -12,7 +12,7 @@ import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 
 
-object DecisionTree {
+object ZooDecisionTree {
   
   def main(args: Array[String]): Unit = {
     
