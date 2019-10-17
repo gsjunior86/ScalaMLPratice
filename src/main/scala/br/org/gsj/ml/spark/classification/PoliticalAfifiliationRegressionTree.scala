@@ -60,7 +60,9 @@ object PoliticalAfifiliationRegressionTree {
     
      val label_string_idx = new StringIndexer().setInputCol("party").setOutputCol("label")
       pipeline_stages = pipeline_stages :+ label_string_idx
+      
       val vector_assembler_inputs = Array[String](categorical_columns.map(f => f + "_classVec"):_*)
+      
       val vector_assembler = new VectorAssembler().setInputCols(vector_assembler_inputs).setOutputCol("features")
       pipeline_stages = pipeline_stages :+ vector_assembler
 

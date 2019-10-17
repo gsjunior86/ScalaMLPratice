@@ -66,10 +66,7 @@ object TweetOptimalKComputation {
     val base_df = stopwords.transform(new_df).withColumn("tweet_clean", tweetClean(col("tweet_clean")))
     .withColumn("array_count", countArray(col("tweet_clean")))
     
-//    base_df.select(explode(col("tweet_clean"))).distinct().show
-    
-    base_df.select(explode(col("tweet_clean"))).distinct().rdd.map(f => f(0).toString()).zipWithIndex()
-    .foreach(println)
+    base_df.select(explode(col("tweet_clean"))).distinct().show
     
 //     val array_count = base_df.groupBy().max("array_count").collect()(0)(0).asInstanceOf[Integer]
 //    
