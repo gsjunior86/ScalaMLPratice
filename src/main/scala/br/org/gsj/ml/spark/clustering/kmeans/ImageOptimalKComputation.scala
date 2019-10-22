@@ -11,14 +11,14 @@ import java.io.File
 /**
  * plot the optimal number of clusters K based on the K-means cost function for a range of K
  */
-object MriOptimalKComputation {
+object ImageOptimalKComputation {
     case class Image(data: Byte)
 
   
   def main(args: Array[String]): Unit = {
     
     val spark = SparkSession.builder().appName("mriClass").master("local[*]").getOrCreate()
-    val mri_healthy_brain_image = "src/main/resources/datasets/clustering/data/mri-images-data/mri-test-brain.png"
+    val mri_healthy_brain_image = "src/main/resources/datasets/images/sf2a/street-fighter-alpha-2-06.png"
     
     val image_df = spark.read.format("image").load(mri_healthy_brain_image).select(col("image.*"))
     image_df.show

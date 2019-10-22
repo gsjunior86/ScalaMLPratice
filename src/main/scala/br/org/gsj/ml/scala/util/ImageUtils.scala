@@ -1,48 +1,46 @@
 package br.org.gsj.ml.scala.util
 
 import javax.imageio.ImageIO
+
+
 import java.awt.image.BufferedImage
 import java.io.File
 
+case class PixelInfo(pixel:Int,a: Int, r: Int, g: Int, b: Int, x: Int, y: Int)
+
 object ImageUtils {
   
-  val colors:Map[Int,Int] = Map(
-      0 -> 0xE5A812, //orange
-      1 -> 0x8136DC, //purple
-      2 -> 0x95FFDF, //cyan
-      3 -> 0xFF3333, //red
-      4 -> 0x0058B6, //blue
-      5 -> 0xE2CE06, //yellow
-      6 -> 0xDB06E2, //pink
-      7 -> 0x67C82C, //green
-      8 -> 0x356F07 //darkgreen
-      )
-  
-  def main(args: Array[String]): Unit = {
-      
-    test
-  }
-  
-  def loadImageArray(path: String): Array[(Int,Int)] = {
+  def loadImageArray(path: String): Array[PixelInfo] = {
+    ImageIO.setUseCache(false)
     val image = ImageIO.read(new File(path))
     
     // obtain width and height of image
     val w = image.getWidth
     val h = image.getHeight
     
-    var array = Array[(Int,Int)]()
+    var array = Array[PixelInfo]()
     var cont = 1
     for (x <- 0 until w)
       for (y <- 0 until h){
-        array = array :+ (image.getRGB(x, y),cont)
+        val argba = printPixelARGB(image.getRGB(x, y))
+        //println(x+","+y)
+        array = array :+ PixelInfo(image.getRGB(x, y),argba._1,argba._2,argba._3,argba._4,x,y)
         cont += 1
       }
       array  
     
   }
   
+  def printPixelARGB(pixel: Int):(Int,Int,Int,Int) = {
+    val alpha = (pixel >> 24) & 0xff;
+    val red = (pixel >> 16) & 0xff;
+    val green = (pixel >> 8) & 0xff;
+    val blue = (pixel) & 0xff;
+    (alpha,red,green,blue)
+  }
   
-  def generateImage(img: BufferedImage, image_array: Array[Byte]): BufferedImage = {
+  
+  def generateImage(img: BufferedImage, image_array: Array[Byte],colors:Map[Int,Int]): BufferedImage = {
     // obtain width and height of image
     val w = img.getWidth
     val h = img.getHeight
@@ -86,15 +84,15 @@ object ImageUtils {
     out
   }
 
-  def test() {
-    // read original image, and obtain width and height
-    val photo1 = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"))
-
-    val photo2 = phototest(photo1)
-    generateImage(photo1,null)
-
-    // save image to file "test.jpg"
-    ImageIO.write(photo2, "jpg", new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-test.png"))
-  }
+//  def test() {
+//    // read original image, and obtain width and height
+//    val photo1 = ImageIO.read(new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-brain.png"))
+//
+//    val photo2 = phototest(photo1)
+//    generateImage(photo1,null)
+//
+//    // save image to file "test.jpg"
+//    ImageIO.write(photo2, "jpg", new File("src/main/resources/datasets/clustering/data/mri-images-data/mri-healthy-test.png"))
+//  }
 
 }
